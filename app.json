@@ -1,12 +1,4 @@
 {
-  "name": "ns-soft-messanger-mobile",
-  "displayName": "ns-soft-messanger-mobile",
-  "expo": {
-    "name": "ns-soft-messanger-mobile",
-    "slug": "ns-soft-messanger-mobile",
-    "version": "1.0.0",
-    "assetBundlePatterns": [
-      "**/*"
-    ]
-  }
+  "name": "mobileMessanger",
+  "displayName": "mobileMessanger"
 }
