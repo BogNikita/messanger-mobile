@@ -11,7 +11,7 @@ function* fetchQueueWorker() {
       .orderByChild('status')
       .equalTo('waiting')
       .once('value');
-    const length = data.val().length;
+    const length = Object.keys(data.val()).length;
     yield put(fetchQueueSuccess(length));
   } catch (e) {
     yield put(fetchQueueError(e.message));

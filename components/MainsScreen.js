@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { Actions } from 'react-native-router-flux';
 import { useDispatch, useSelector } from 'react-redux';
+import { fetchChatRequest } from '../store/actions/chat';
 import { fetchThemesRequest } from '../store/actions/themes';
 import SelectGroup from './SelectGroup';
 
@@ -18,6 +19,7 @@ const MainScreen = () => {
   );
   const [pickedThemes, setPickedThemes] = useState('');
   const [pickedSubThemes, setPickedSubThemes] = useState('');
+  const [name, setName] = useState('');
 
   const dispatch = useDispatch();
 
@@ -37,7 +39,7 @@ const MainScreen = () => {
     if (arr?.length) {
       const title = arr.map((item, i) => ({
         label: item,
-        value: i + 1,
+        value: i,
       }));
       return title;
     }
@@ -46,12 +48,24 @@ const MainScreen = () => {
   const clickHandler = item => {
     setPickedThemes(item);
     const defaultSubTitle = getThemes(themes[item]);
-    setPickedSubThemes(defaultSubTitle[0]);
+    setPickedSubThemes(defaultSubTitle[0].label);
   };
 
   const subTitle = pickedThemes
     ? getThemes(themes[pickedThemes])
     : [pickedSubThemes];
+
+  const submitHandler = () => {
+    if (name && pickedSubThemes) {
+      const message = {
+        writtenBy: name,
+        timestamp: Date.now(),
+        content: pickedSubThemes,
+      };
+      dispatch(fetchChatRequest(message));
+      Actions.push('wait');
+    }
+  };
 
   return (
     <View style={styles.Container}>
@@ -59,7 +73,7 @@ const MainScreen = () => {
         <View>
           <Text style={styles.Label}>Введите имя</Text>
           <TextInput
-            onChangeText={text => console.log(text)}
+            onChangeText={setName}
             style={styles.Input}
             placeholder="Введите Ваше имя"
           />
@@ -75,11 +89,10 @@ const MainScreen = () => {
           title="Выберите подтему"
           pickedData={pickedSubThemes}
           setPickedData={setPickedSubThemes}
-          enabled={!!pickedThemes}
         />
       </View>
       {isError && <Text style={styles.Error}>{errorMessage}</Text>}
-      <Button onPress={() => Actions.push('wait')} title="Войти в чат" />
+      <Button onPress={submitHandler} title="Войти в чат" />
     </View>
   );
 };
