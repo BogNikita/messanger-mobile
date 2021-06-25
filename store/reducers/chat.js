@@ -3,6 +3,8 @@ import {
   FETCH_CHAT_REQUEST,
   FETCH_CHAT_SUCCESS,
   ADD_NEW_MESSAGE,
+  CHAT_UPDATE,
+  CHAT_END,
 } from '../actions/action.type';
 
 const initialState = {
@@ -14,6 +16,7 @@ const initialState = {
     id: null,
     messages: [],
     status: null,
+    operatorId: 'opearator',
   },
 };
 
@@ -51,7 +54,22 @@ export default function chat(state = initialState, action) {
         ...state,
         chat: {
           ...state.chat,
-          messages: [...state.chat.messages, action.messages],
+          messages: [...state.chat.messages, action.message],
+        },
+      };
+    }
+    case CHAT_UPDATE: {
+      return {
+        ...state,
+        chat: action.chat,
+      };
+    }
+    case CHAT_END: {
+      return {
+        ...state,
+        chat: {
+          ...state.chat,
+          status: 'offline',
         },
       };
     }
