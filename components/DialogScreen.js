@@ -1,8 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState, useEffect } from 'react';
 import { Text, View, StyleSheet, Button, TextInput } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { Actions } from 'react-native-router-flux';
+import { usePubNub } from 'pubnub-react';
 import { fetchChatEnd, fetchChatNewMessage } from '../store/actions/chat';
 import MessageList from './elements/MessageList';
 
@@ -10,12 +11,72 @@ const DialogScreen = () => {
   const {
     isError,
     errorMessage,
-    chat: { operatorId, id, messages },
+    chat: { id, messages, operatorName },
   } = useSelector(state => state.chat);
 
   const dispatch = useDispatch();
-
+  const pubnub = usePubNub();
   const [text, setText] = useState('');
+  const [isTyping, setTyping] = useState(false);
+
+  const timeoutCache = useRef(0);
+
+  const typingSignal = useCallback(s => {
+    if (
+      s.message.typing === '0' &&
+      s.message.id === id &&
+      s.message.author === 'operator'
+    ) {
+      setTyping(false);
+    }
+    if (
+      s.message.typing === '1' &&
+      s.message.id === id &&
+      s.message.author === 'operator'
+    ) {
+      setTyping(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    pubnub.addListener({
+      signal: typingSignal,
+    });
+    pubnub.subscribe({ channels: ['typing'] });
+
+    return () => {
+      pubnub.unsubscribeAll();
+    };
+  }, [typingSignal, pubnub]);
+
+  const onInputChange = useCallback(
+    inputValue => {
+      clearInterval(timeoutCache.current);
+      if ((inputValue && !isTyping) || (!inputValue && isTyping)) {
+        pubnub.signal({
+          channel: 'typing',
+          message: {
+            typing: inputValue ? '1' : '0',
+            id,
+            author: 'client',
+          },
+        });
+      }
+      timeoutCache.current = setTimeout(() => {
+        pubnub.signal({
+          channel: 'typing',
+          message: {
+            typing: '0',
+            id,
+            author: 'client',
+          },
+        });
+      }, 5000);
+      setText(inputValue);
+      return;
+    },
+    [id, isTyping],
+  );
 
   const clickHandler = useCallback(() => {
     dispatch(fetchChatEnd(id));
@@ -37,13 +98,18 @@ const DialogScreen = () => {
   return (
     <View style={styles.Container}>
       <View style={styles.Header}>
-        <Text style={styles.Text}>Вы общаетесь с опeратором {operatorId}</Text>
+        <Text style={styles.Text}>
+          Вы общаетесь с опeратором {operatorName ? operatorName : ''}
+        </Text>
         <Button title="Завершить диалог" onPress={clickHandler} />
       </View>
+      {isTyping && (
+        <Text style={styles.Typing}>Оператор набирает сообщение</Text>
+      )}
       <MessageList userName={userName.current} />
       <View>
         <TextInput
-          onChangeText={setText}
+          onChangeText={onInputChange}
           style={styles.Input}
           placeholder="Введите Ваше сообщение"
         />
@@ -89,6 +155,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 20,
     color: 'red',
+  },
+  Typing: {
+    textAlign: 'center',
+    fontStyle: 'italic',
+    color: '#555453',
+    padding: 10,
   },
 });
 
