@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { StyleSheet, ScrollView } from 'react-native';
-import { useSelector } from 'react-redux';
 import MessageItem from './MessageItem';
 
-const MessageList = ({ userName }) => {
-  const { messages } = useSelector(state => state.chat.chat);
+const MessageList = ({ userName, messages }) => {
+  const scrollViewRef = useRef();
   return (
-    <ScrollView style={styles.MessageField}>
+    <ScrollView
+      style={styles.MessageField}
+      ref={scrollViewRef}
+      onContentSizeChange={() => scrollViewRef.current.scrollToEnd()}>
       {messages.map((item, i) => (
         <MessageItem key={i} {...item} userName={userName} />
       ))}

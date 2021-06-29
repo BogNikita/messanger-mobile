@@ -52,6 +52,8 @@ export default function chat(state = initialState, action) {
     case ADD_NEW_MESSAGE: {
       return {
         ...state,
+        isError: null,
+        errorMessage: null,
         chat: {
           ...state.chat,
           messages: [...state.chat.messages, action.message],

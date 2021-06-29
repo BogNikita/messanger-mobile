@@ -1,11 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useCallback, useRef, useState, useEffect } from 'react';
-import { Text, View, StyleSheet, Button, TextInput } from 'react-native';
+import { Text, View, StyleSheet, Button } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { Actions } from 'react-native-router-flux';
 import { usePubNub } from 'pubnub-react';
 import { fetchChatEnd, fetchChatNewMessage } from '../store/actions/chat';
 import MessageList from './elements/MessageList';
+import SendMessage from './elements/SendMessage';
 
 const DialogScreen = () => {
   const {
@@ -16,7 +17,7 @@ const DialogScreen = () => {
 
   const dispatch = useDispatch();
   const pubnub = usePubNub();
-  const [text, setText] = useState('');
+
   const [isTyping, setTyping] = useState(false);
 
   const timeoutCache = useRef(0);
@@ -47,7 +48,7 @@ const DialogScreen = () => {
     return () => {
       pubnub.unsubscribeAll();
     };
-  }, [typingSignal, pubnub]);
+  }, []);
 
   const onInputChange = useCallback(
     inputValue => {
@@ -72,28 +73,20 @@ const DialogScreen = () => {
           },
         });
       }, 5000);
-      setText(inputValue);
-      return;
     },
     [id, isTyping],
   );
 
-  const clickHandler = useCallback(() => {
+  const clickHandler = () => {
     dispatch(fetchChatEnd(id));
     Actions.push('main');
-  }, []);
+  };
 
   const userName = useRef(messages[0].writtenBy);
 
-  const sendHandler = useCallback(() => {
-    const message = {
-      content: text,
-      imgSrc: '',
-      writtenBy: userName.current,
-      timestamp: Date.now(),
-    };
+  const sendMessage = message => {
     dispatch(fetchChatNewMessage(message, id, messages.length));
-  }, [text]);
+  };
 
   return (
     <View style={styles.Container}>
@@ -106,16 +99,13 @@ const DialogScreen = () => {
       {isTyping && (
         <Text style={styles.Typing}>Оператор набирает сообщение</Text>
       )}
-      <MessageList userName={userName.current} />
-      <View>
-        <TextInput
-          onChangeText={onInputChange}
-          style={styles.Input}
-          placeholder="Введите Ваше сообщение"
-        />
-        {isError && <Text style={styles.Error}>{errorMessage}</Text>}
-        <Button title="отправить сообщение" onPress={sendHandler} />
-      </View>
+      <MessageList userName={userName.current} messages={messages} />
+      {isError && <Text style={styles.Error}>{errorMessage}</Text>}
+      <SendMessage
+        sendMessage={sendMessage}
+        onInputChange={onInputChange}
+        userName={userName.current}
+      />
     </View>
   );
 };
@@ -144,12 +134,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
     paddingVertical: 10,
     marginBottom: 10,
-  },
-  Input: {
-    backgroundColor: '#f3f3f3',
-    borderRadius: 5,
-    padding: 12,
-    height: 60,
   },
   Error: {
     textAlign: 'center',

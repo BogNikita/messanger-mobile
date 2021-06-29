@@ -1,4 +1,5 @@
 import { put, takeLatest } from 'redux-saga/effects';
+import storage from '@react-native-firebase/storage';
 import {
   FETCH_CHAT_END,
   FETCH_CHAT_NEW_MESSAGE,
@@ -22,7 +23,7 @@ function* fetchChatWorker({ message }) {
       .orderByKey()
       .limitToLast(1)
       .once('value');
-    const index = +Object.keys(data.val())[0];
+    const index = Number(Object.keys(data.val())[0]);
     yield firebase
       .database()
       .ref(`chatList/${index + 1}`)
@@ -48,14 +49,20 @@ function* fetchChatUpdateWorker({ id }) {
     yield put(fetchChatError(e.message));
   }
 }
-
 function* fetchAddNewMessageWorker({ message, id, index }) {
   try {
+    let imgSrc = '';
+    if (message.imgSrc) {
+      yield storage().ref(`images/${id}_${index}.jpg`).putFile(message.imgSrc);
+      imgSrc = yield storage()
+        .ref(`images/${id}_${index}.jpg`)
+        .getDownloadURL();
+    }
     yield firebase
       .database()
       .ref(`chatList/${id - 1}/messages/${index}`)
-      .set({ ...message });
-    yield put(addNewMessage(message));
+      .set({ ...message, imgSrc });
+    yield put(addNewMessage({ ...message, imgSrc }));
   } catch (e) {
     yield put(fetchChatError(e.message));
   }
