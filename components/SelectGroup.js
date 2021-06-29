@@ -1,33 +1,28 @@
 import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
-// import { Picker } from 'react-native-woodpicker';
 import { Picker } from '@react-native-picker/picker';
 
-const SelectGroup = ({
-  title,
-  data,
-  pickedData,
-  setPickedData,
-  enabled = true,
-}) => {
-  const pickerItem = data.map(({ label, value }) => (
-    <Picker.Item
-      style={styles.pickerStyle}
-      key={`${value}_${label}`}
-      label={label}
-      value={label}
-    />
-  ));
-
+const SelectGroup = ({ title, data, pickedData, setPickedData }) => {
   return (
     <View style={styles.Container}>
       <Text style={styles.Label}>{title}:</Text>
       <Picker
         prompt={title}
         selectedValue={pickedData}
-        onValueChange={setPickedData}
-        enabled={enabled}>
-        {pickerItem}
+        onValueChange={setPickedData}>
+        <Picker.Item
+          style={styles.pickerStyle}
+          label="Выберете значение..."
+          value=""
+          enabled={false}
+        />
+        {data.map(item => (
+          <Picker.Item
+            key={`${item.value}_${item.label}`}
+            label={item.label}
+            value={item.label}
+          />
+        ))}
       </Picker>
     </View>
   );
@@ -47,4 +42,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SelectGroup;
+export default React.memo(SelectGroup);
