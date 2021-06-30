@@ -43,11 +43,11 @@ const WaitScreen = () => {
       }
     });
     OneSignal.setNotificationOpenedHandler(() => {
-      Actions.push('dialog');
+      Actions.push('active');
       dispatch(fetchChatUpdate(id));
     });
     OneSignal.setNotificationWillShowInForegroundHandler(() => {
-      Actions.push('dialog');
+      Actions.push('active');
       dispatch(fetchChatUpdate(id));
     });
   };

@@ -5,6 +5,7 @@ import {
   ADD_NEW_MESSAGE,
   CHAT_UPDATE,
   CHAT_END,
+  ANIMATED_NEW_MESSAGE,
 } from '../actions/action.type';
 
 const initialState = {
@@ -12,6 +13,7 @@ const initialState = {
   isSuccess: null,
   isError: null,
   errorMessage: null,
+  animatedNewMessage: false,
   chat: {
     id: null,
     messages: [],
@@ -73,6 +75,12 @@ export default function chat(state = initialState, action) {
           ...state.chat,
           status: 'offline',
         },
+      };
+    }
+    case ANIMATED_NEW_MESSAGE: {
+      return {
+        ...state,
+        animatedNewMessage: action.value,
       };
     }
     default:

@@ -13,3 +13,4 @@ export const FETCH_CHAT_UPDATE = 'FETCH_CHAT_UPDATE';
 export const CHAT_UPDATE = 'CHAT_UPDATE';
 export const FETCH_CHAT_END = 'FETCH_CHAT_END';
 export const CHAT_END = 'CHAT_END';
+export const ANIMATED_NEW_MESSAGE = 'ANIMATED_NEW_MESSAGE';

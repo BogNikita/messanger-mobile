@@ -65,7 +65,7 @@ const MainScreen = () => {
         content: pickedSubThemes,
       };
       dispatch(fetchChatRequest(message));
-      Actions.push('wait');
+      Actions.push('waiting');
     }
   };
 
@@ -78,6 +78,7 @@ const MainScreen = () => {
             onChangeText={setName}
             style={styles.Input}
             placeholder="Введите Ваше имя"
+            value={name}
           />
         </View>
         <SelectGroup

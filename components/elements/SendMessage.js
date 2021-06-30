@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { TouchableOpacity, View, TextInput, StyleSheet } from 'react-native';
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -14,7 +14,7 @@ const SendMessage = ({ onInputChange, userName, sendMessage }) => {
     setText(value);
   };
 
-  const sendHandler = () => {
+  const sendHandler = useCallback(() => {
     if (text || imgSrc) {
       const message = {
         content: text,
@@ -26,13 +26,14 @@ const SendMessage = ({ onInputChange, userName, sendMessage }) => {
       setImgSrc('');
       setText('');
     }
-  };
+  }, [text, imgSrc]);
   return (
     <View style={styles.Form}>
       <TextInput
         onChangeText={inputHandler}
         style={styles.Input}
         placeholder="Введите Ваше сообщение"
+        value={text}
       />
       <View style={styles.Icon}>
         <Camera setImgSrc={setImgSrc} />

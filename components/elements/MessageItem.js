@@ -1,13 +1,24 @@
-import React from 'react';
-import { Text, View, StyleSheet, Image } from 'react-native';
+import React, { useRef, useEffect } from 'react';
+import { Text, StyleSheet, Image, Animated } from 'react-native';
 import moment from 'moment';
 
 function MessageItem({ timestamp, content, writtenBy, userName, imgSrc }) {
+  console.log('render MessageItem');
+  const value = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(value, {
+      toValue: 1,
+      useNativeDriver: true,
+      duration: 1500,
+    }).start();
+  }, []);
   return (
-    <View
+    <Animated.View
       style={[
         styles.Message,
         userName === writtenBy ? styles.User : styles.Operator,
+        { opacity: value },
       ]}>
       <Text>{content}</Text>
       {imgSrc ? (
@@ -18,7 +29,7 @@ function MessageItem({ timestamp, content, writtenBy, userName, imgSrc }) {
         />
       ) : null}
       <Text style={styles.MessageTime}>{moment(timestamp).calendar()}</Text>
-    </View>
+    </Animated.View>
   );
 }
 

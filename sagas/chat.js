@@ -1,4 +1,4 @@
-import { put, takeLatest } from 'redux-saga/effects';
+import { put, takeLatest, delay } from 'redux-saga/effects';
 import storage from '@react-native-firebase/storage';
 import {
   FETCH_CHAT_END,
@@ -12,6 +12,7 @@ import {
   fetchChatSuccess,
   addNewMessage,
   chatEnd,
+  animatedNewMessage,
 } from '../store/actions/chat';
 import firebase from 'firebase/app';
 
@@ -63,6 +64,9 @@ function* fetchAddNewMessageWorker({ message, id, index }) {
       .ref(`chatList/${id - 1}/messages/${index}`)
       .set({ ...message, imgSrc });
     yield put(addNewMessage({ ...message, imgSrc }));
+    yield put(animatedNewMessage(true));
+    yield delay(1000);
+    yield put(animatedNewMessage(false));
   } catch (e) {
     yield put(fetchChatError(e.message));
   }

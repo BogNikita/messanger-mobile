@@ -1,13 +1,18 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useCallback, useRef, useState, useEffect } from 'react';
-import { Text, View, StyleSheet, Button } from 'react-native';
+import { Text, View, StyleSheet, Button, LogBox } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { Actions } from 'react-native-router-flux';
 import { usePubNub } from 'pubnub-react';
-import { fetchChatEnd, fetchChatNewMessage } from '../store/actions/chat';
+import {
+  addNewMessage,
+  fetchChatEnd,
+  fetchChatNewMessage,
+  fetchChatUpdate,
+} from '../store/actions/chat';
 import MessageList from './elements/MessageList';
 import SendMessage from './elements/SendMessage';
-
+LogBox.ignoreLogs(['Setting a timer']);
 const DialogScreen = () => {
   const {
     isError,
@@ -21,6 +26,7 @@ const DialogScreen = () => {
   const [isTyping, setTyping] = useState(false);
 
   const timeoutCache = useRef(0);
+  const userName = useRef(messages[0].writtenBy);
 
   const typingSignal = useCallback(s => {
     if (
@@ -39,14 +45,28 @@ const DialogScreen = () => {
     }
   }, []);
 
+  const sendMessage = message => {
+    pubnub.publish({ channel: `channel_${id}`, message });
+    dispatch(fetchChatNewMessage(message, id, messages.length));
+  };
+
+  const getNewMessage = useCallback(({ message }) => {
+    if (message.writtenBy !== userName.current) {
+      dispatch(addNewMessage(message));
+    }
+  }, []);
+
   useEffect(() => {
-    pubnub.addListener({
-      signal: typingSignal,
-    });
-    pubnub.subscribe({ channels: ['typing'] });
+    dispatch(fetchChatUpdate(id));
+    //для удаления дубликатов сообщений
+    pubnub.setUUID(userName.current);
+    const listener = { signal: typingSignal, message: getNewMessage };
+    pubnub.addListener(listener);
+    pubnub.subscribe({ channels: ['typing', `channel_${id}`] });
 
     return () => {
       pubnub.unsubscribeAll();
+      pubnub.removeListener(listener);
     };
   }, []);
 
@@ -80,12 +100,6 @@ const DialogScreen = () => {
   const clickHandler = () => {
     dispatch(fetchChatEnd(id));
     Actions.push('main');
-  };
-
-  const userName = useRef(messages[0].writtenBy);
-
-  const sendMessage = message => {
-    dispatch(fetchChatNewMessage(message, id, messages.length));
   };
 
   return (

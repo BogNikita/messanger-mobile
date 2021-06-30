@@ -13,8 +13,10 @@ const ImagePicker = ({ setImgSrc }) => {
       quality: 1,
     };
     launchImageLibrary(options, response => {
-      const uri = response.assets[0].uri;
-      setImgSrc(uri);
+      if (!response.didCancel) {
+        const uri = response?.assets[0]?.uri;
+        setImgSrc(uri);
+      }
     });
   };
 
