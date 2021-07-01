@@ -3,7 +3,6 @@ import { Text, StyleSheet, Image, Animated } from 'react-native';
 import moment from 'moment';
 
 function MessageItem({ timestamp, content, writtenBy, userName, imgSrc }) {
-  console.log('render MessageItem');
   const value = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {

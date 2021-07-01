@@ -69,19 +69,7 @@ export default function chat(state = initialState, action) {
       };
     }
     case CHAT_END: {
-      return {
-        ...state,
-        chat: {
-          ...state.chat,
-          status: 'offline',
-        },
-      };
-    }
-    case ANIMATED_NEW_MESSAGE: {
-      return {
-        ...state,
-        animatedNewMessage: action.value,
-      };
+      return initialState;
     }
     default:
       return state;

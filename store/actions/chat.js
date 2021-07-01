@@ -35,7 +35,6 @@ export function fetchChatError(error) {
 }
 
 export function fetchChatNewMessage(message, id, index) {
-  console.log('fetchChatNewMessage');
   return {
     type: FETCH_CHAT_NEW_MESSAGE,
     message,
@@ -45,7 +44,6 @@ export function fetchChatNewMessage(message, id, index) {
 }
 
 export function addNewMessage(message) {
-  console.log('addNewMessage');
   return {
     type: ADD_NEW_MESSAGE,
     message,
@@ -66,22 +64,16 @@ export function chatUpdate(chat) {
   };
 }
 
-export function fetchChatEnd(id) {
+export function fetchChatEnd(id, rate) {
   return {
     type: FETCH_CHAT_END,
     id,
+    rate,
   };
 }
 
 export function chatEnd() {
   return {
     type: CHAT_END,
-  };
-}
-
-export function animatedNewMessage(value) {
-  return {
-    type: ANIMATED_NEW_MESSAGE,
-    value,
   };
 }

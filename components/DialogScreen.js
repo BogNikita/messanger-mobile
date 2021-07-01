@@ -6,13 +6,14 @@ import { Actions } from 'react-native-router-flux';
 import { usePubNub } from 'pubnub-react';
 import {
   addNewMessage,
-  fetchChatEnd,
   fetchChatNewMessage,
   fetchChatUpdate,
 } from '../store/actions/chat';
 import MessageList from './elements/MessageList';
 import SendMessage from './elements/SendMessage';
+
 LogBox.ignoreLogs(['Setting a timer']);
+
 const DialogScreen = () => {
   const {
     isError,
@@ -26,7 +27,7 @@ const DialogScreen = () => {
   const [isTyping, setTyping] = useState(false);
 
   const timeoutCache = useRef(0);
-  const userName = useRef(messages[0].writtenBy);
+  const userName = messages[0]?.writtenBy;
 
   const typingSignal = useCallback(s => {
     if (
@@ -49,17 +50,14 @@ const DialogScreen = () => {
     pubnub.publish({ channel: `channel_${id}`, message });
     dispatch(fetchChatNewMessage(message, id, messages.length));
   };
-
   const getNewMessage = useCallback(({ message }) => {
-    if (message.writtenBy !== userName.current) {
+    if (message.writtenBy !== userName) {
       dispatch(addNewMessage(message));
     }
   }, []);
 
   useEffect(() => {
-    dispatch(fetchChatUpdate(id));
-    //для удаления дубликатов сообщений
-    pubnub.setUUID(userName.current);
+    pubnub.setUUID(userName);
     const listener = { signal: typingSignal, message: getNewMessage };
     pubnub.addListener(listener);
     pubnub.subscribe({ channels: ['typing', `channel_${id}`] });
@@ -98,8 +96,7 @@ const DialogScreen = () => {
   );
 
   const clickHandler = () => {
-    dispatch(fetchChatEnd(id));
-    Actions.push('main');
+    Actions.push('rate');
   };
 
   return (
@@ -113,12 +110,12 @@ const DialogScreen = () => {
       {isTyping && (
         <Text style={styles.Typing}>Оператор набирает сообщение</Text>
       )}
-      <MessageList userName={userName.current} messages={messages} />
+      <MessageList userName={userName} messages={messages} />
       {isError && <Text style={styles.Error}>{errorMessage}</Text>}
       <SendMessage
         sendMessage={sendMessage}
         onInputChange={onInputChange}
-        userName={userName.current}
+        userName={userName}
       />
     </View>
   );
