@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useRef, useEffect } from 'react';
 import { Text, StyleSheet, Image, Animated } from 'react-native';
 import moment from 'moment';
@@ -12,6 +13,7 @@ function MessageItem({ timestamp, content, writtenBy, userName, imgSrc }) {
       duration: 1500,
     }).start();
   }, []);
+
   return (
     <Animated.View
       style={[

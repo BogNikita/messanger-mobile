@@ -5,7 +5,6 @@ import {
   ADD_NEW_MESSAGE,
   CHAT_UPDATE,
   CHAT_END,
-  ANIMATED_NEW_MESSAGE,
 } from '../actions/action.type';
 
 const initialState = {

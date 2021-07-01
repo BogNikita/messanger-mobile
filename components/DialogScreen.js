@@ -4,11 +4,7 @@ import { Text, View, StyleSheet, Button, LogBox } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { Actions } from 'react-native-router-flux';
 import { usePubNub } from 'pubnub-react';
-import {
-  addNewMessage,
-  fetchChatNewMessage,
-  fetchChatUpdate,
-} from '../store/actions/chat';
+import { addNewMessage, fetchChatNewMessage } from '../store/actions/chat';
 import MessageList from './elements/MessageList';
 import SendMessage from './elements/SendMessage';
 

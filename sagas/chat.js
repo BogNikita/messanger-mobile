@@ -12,7 +12,6 @@ import {
   fetchChatSuccess,
   addNewMessage,
   chatEnd,
-  animatedNewMessage,
 } from '../store/actions/chat';
 import firebase from 'firebase/app';
 

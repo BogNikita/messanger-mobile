@@ -8,7 +8,6 @@ import {
   CHAT_UPDATE,
   CHAT_END,
   FETCH_CHAT_END,
-  ANIMATED_NEW_MESSAGE,
 } from './action.type';
 
 export function fetchChatRequest(message) {
