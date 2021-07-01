@@ -1,4 +1,4 @@
-import { put, takeLatest, delay } from 'redux-saga/effects';
+import { put, takeLatest } from 'redux-saga/effects';
 import storage from '@react-native-firebase/storage';
 import {
   FETCH_CHAT_END,
