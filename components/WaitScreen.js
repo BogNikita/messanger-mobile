@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -11,6 +12,7 @@ import { Actions } from 'react-native-router-flux';
 import { useDispatch, useSelector } from 'react-redux';
 import OneSignal from 'react-native-onesignal';
 import { fetchQueueRequest } from '../store/actions/queue';
+import { fetchChatUpdate } from '../store/actions/chat';
 
 const WaitScreen = () => {
   const { queueLength, isSuccess } = useSelector(state => state.queue);
@@ -21,6 +23,9 @@ const WaitScreen = () => {
 
   useEffect(() => {
     dispatch(fetchQueueRequest());
+    return () => {
+      OneSignal.removeExternalUserId();
+    };
   }, []);
 
   if (!isSuccess) {
@@ -39,9 +44,11 @@ const WaitScreen = () => {
     });
     OneSignal.setNotificationOpenedHandler(() => {
       Actions.push('dialog');
+      dispatch(fetchChatUpdate(id));
     });
     OneSignal.setNotificationWillShowInForegroundHandler(() => {
       Actions.push('dialog');
+      dispatch(fetchChatUpdate(id));
     });
   };
 
@@ -63,14 +70,13 @@ const WaitScreen = () => {
           />
         </View>
       </View>
-      {subscribeNotification && (
+      {subscribeNotification ? (
         <Text style={styles.Text}>Вы успешно подписались</Text>
+      ) : (
+        <Button title="Напомнить когда придет очередь" onPress={clickHandler} />
       )}
-      <Button
-        title="Напомнить когда придет очередь"
-        onPress={() => clickHandler()}
-      />
-      <Button onPress={() => Actions.pop()} title="back" />
+
+      <Button onPress={() => Actions.push('main')} title="back" />
     </View>
   );
 };

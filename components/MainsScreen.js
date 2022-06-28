@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -11,12 +12,13 @@ import { Actions } from 'react-native-router-flux';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchChatRequest } from '../store/actions/chat';
 import { fetchThemesRequest } from '../store/actions/themes';
-import SelectGroup from './SelectGroup';
+import SelectGroup from './elements/SelectGroup';
 
 const MainScreen = () => {
   const { isError, errorMessage, isSuccess, themes } = useSelector(
     state => state.themes,
   );
+
   const [pickedThemes, setPickedThemes] = useState('');
   const [pickedSubThemes, setPickedSubThemes] = useState('');
   const [name, setName] = useState('');
@@ -27,15 +29,7 @@ const MainScreen = () => {
     dispatch(fetchThemesRequest());
   }, []);
 
-  if (!isSuccess) {
-    return (
-      <View style={[styles.container, styles.horizontal]}>
-        <ActivityIndicator size="large" color="#00ff00" />
-      </View>
-    );
-  }
-
-  const getThemes = arr => {
+  const getThemes = useCallback(arr => {
     if (arr?.length) {
       const title = arr.map((item, i) => ({
         label: item,
@@ -43,7 +37,15 @@ const MainScreen = () => {
       }));
       return title;
     }
-  };
+  }, []);
+
+  if (!isSuccess) {
+    return (
+      <View style={[styles.container, styles.horizontal]}>
+        <ActivityIndicator size="large" color="#00ff00" />
+      </View>
+    );
+  }
 
   const clickHandler = item => {
     setPickedThemes(item);
@@ -55,7 +57,7 @@ const MainScreen = () => {
     ? getThemes(themes[pickedThemes])
     : [pickedSubThemes];
 
-  const submitHandler = () => {
+  const submitHandler = async () => {
     if (name && pickedSubThemes) {
       const message = {
         writtenBy: name,
