@@ -57,7 +57,7 @@ const MainScreen = () => {
     ? getThemes(themes[pickedThemes])
     : [pickedSubThemes];
 
-  const submitHandler = async () => {
+  const submitHandler = () => {
     if (name && pickedSubThemes) {
       const message = {
         writtenBy: name,

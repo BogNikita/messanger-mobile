@@ -5,6 +5,8 @@ import { PersistGate } from 'redux-persist/integration/react';
 import OneSignal from 'react-native-onesignal';
 import moment from 'moment';
 import 'moment/locale/ru';
+import { PubNubProvider } from 'pubnub-react';
+import { pubnub } from './config/pubnub.config';
 import { store, persistor } from './store';
 import Navigate from './Navigate';
 
@@ -14,13 +16,15 @@ moment.locale('ru');
 
 const App = () => {
   return (
-    <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <SafeAreaView style={styles.Container}>
-          <Navigate />
-        </SafeAreaView>
-      </PersistGate>
-    </Provider>
+    <PubNubProvider client={pubnub}>
+      <Provider store={store}>
+        <PersistGate loading={null} persistor={persistor}>
+          <SafeAreaView style={styles.Container}>
+            <Navigate />
+          </SafeAreaView>
+        </PersistGate>
+      </Provider>
+    </PubNubProvider>
   );
 };
 
